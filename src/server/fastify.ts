@@ -7,8 +7,14 @@ import ordersRoute from './routes/orders.route';
 
 export function buildServer() {
   const app = Fastify({ logger });
+
+  // MUST BE FIRST
   app.register(websocketPlugin);
-  app.register(healthRoute);
+
+  // Add prefix so it doesn't shadow other routes
+  app.register(healthRoute, { prefix: '/api' });
+
+  // Correct prefix for order-related routes
   app.register(ordersRoute, { prefix: '/api/orders' });
 
   app.setErrorHandler((error, request, reply) => {
@@ -20,5 +26,6 @@ export function buildServer() {
       message: error.message
     });
   });
+
   return app;
 }

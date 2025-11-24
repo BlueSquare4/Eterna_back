@@ -1,7 +1,11 @@
+// src/queue/redis.ts
 import IORedis from 'ioredis';
-import RedisMock from 'ioredis-mock';
 
-import { env } from '../config/env';
+const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 
-const useMock = env.nodeEnv === 'test';
-export const redisClient = useMock ? new (RedisMock as any)() : new IORedis(env.redisUrl);
+export const redisClient = new IORedis(redisUrl, {
+  maxRetriesPerRequest: null,   // REQUIRED FOR BULLMQ
+  enableAutoPipelining: true,   // optional, improves performance
+});
+
+export default redisClient;
